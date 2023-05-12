@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
 	if (data) {
 		return res.send(data).status(200);
 	} else {
-		res.send("There was an error processing this.").status(500);
+		return res.send("There was an error processing this.").status(500);
 	}
 });
 
