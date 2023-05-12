@@ -36,17 +36,21 @@ app.get("/", (req, res) => {
 			pingHigh = Math.round(Math.max(...pings));
 
 			let response = [
-				`# HELP fivem_players_names The names of the players on the server`,
-				`fivem_player_names{server="${serverShortcode}"} ${playerNames}`,
 				`# HELP fivem_player_pings_average The average ping of the players on the server`,
 				`fivem_player_pings_average{server="${serverShortcode}"} ${pingAverage}`,
 				`# HELP fivem_player_pings_low The lowest ping of the players on the server`,
 				`fivem_player_pings_low{server="${serverShortcode}"} ${pingLow}`,
 				`# HELP fivem_player_pings_high The highest ping of the players on the server`,
 				`fivem_player_pings_high{server="${serverShortcode}"} ${pingHigh}`,
-			].join("\n");
+				`# HELP fivem_players_names The names of the players on the server`,
+				`# TYPE fivem_players_names gauge`,
+			]
 
-			return res.send(response).status(200);
+			playerNames.forEach(p => {
+				response.push(`fivem_players_names{server="${serverShortcode}",name="${p}"} 1`);
+			});
+
+			return res.send(response.join("\n")).status(200);
 		}).catch(err => {
 		return res.send(err.response).status(500);
 	})
