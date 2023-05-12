@@ -16,16 +16,6 @@ const serverShortcode = env.SERVER_SHORTCODE;
 app.get("/", (req, res) => {
 	res.type('text/plain');
 
-	let data = getData();
-
-	if (data) {
-		return res.send(data).status(200);
-	} else {
-		return res.send("There was an error processing this.").status(500);
-	}
-});
-
-function getData() {
 	axios.get(`http://${serverIp}/players.json`)
 		.then(data => {
 			let playerNames = data.data.map(p => p.name);
@@ -45,7 +35,7 @@ function getData() {
 			pingLow = Math.round(Math.min(...pings));
 			pingHigh = Math.round(Math.max(...pings));
 
-			return [
+			let response = [
 				`# HELP fivem_players_names The names of the players on the server`,
 				`fivem_player_names{server="${serverShortcode}"} ${playerNames}`,
 				`# HELP fivem_player_pings_average The average ping of the players on the server`,
@@ -55,12 +45,12 @@ function getData() {
 				`# HELP fivem_player_pings_high The highest ping of the players on the server`,
 				`fivem_player_pings_high{server="${serverShortcode}"} ${pingHigh}`,
 			].join("\n");
-		}).catch(err => {
-		console.error(err);
 
-		return false;
+			return res.send(response).status(200);
+		}).catch(err => {
+		return res.send(err.response).status(500);
 	})
-}
+});
 
 // getTxVersion();
 // setTimeout(() => {
